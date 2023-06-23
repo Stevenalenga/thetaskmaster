@@ -1,119 +1,184 @@
-import * as React from "react";
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { UserApi } from "./Api/UserApi";
+//import {Eye, EyeActive} from '../../assets';
 
-const Stack = createStackNavigator();
-const Tab = createMaterialTopTabNavigator();
+export default function LoginScreen({ navigation }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [seePassword, setSeePassword] = useState(true);
+  const [checkValidEmail, setCheckValidEmail] = useState(false);
 
-function MyStack() {
+  const handleCheckEmail = (text) => {
+    let re = /\S+@\S+\.\S+/;
+    let regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+
+    setEmail(text);
+    if (re.test(text) || regex.test(text)) {
+      setCheckValidEmail(false);
+    } else {
+      setCheckValidEmail(true);
+    }
+  };
+
+  const checkPasswordValidity = (value) => {
+    const isNonWhiteSpace = /^\S*$/;
+    if (!isNonWhiteSpace.test(value)) {
+      return "Password must not contain Whitespaces.";
+    }
+
+    const isContainsUppercase = /^(?=.*[A-Z]).*$/;
+    if (!isContainsUppercase.test(value)) {
+      return "Password must have at least one Uppercase Character.";
+    }
+
+    const isContainsLowercase = /^(?=.*[a-z]).*$/;
+    if (!isContainsLowercase.test(value)) {
+      return "Password must have at least one Lowercase Character.";
+    }
+
+    const isContainsNumber = /^(?=.*[0-9]).*$/;
+    if (!isContainsNumber.test(value)) {
+      return "Password must contain at least one Digit.";
+    }
+
+    const isValidLength = /^.{8,16}$/;
+    if (!isValidLength.test(value)) {
+      return "Password must be 8-16 Characters Long.";
+    }
+
+    // const isContainsSymbol =
+    //   /^(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹]).*$/;
+    // if (!isContainsSymbol.test(value)) {
+    //   return 'Password must contain at least one Special Symbol.';
+    // }
+
+    return null;
+  };
+
+  const handleLogin = () => {
+    const checkPassowrd = checkPasswordValidity(password);
+    if (!checkPassowrd) {
+      UserApi({
+        email: email.toLocaleLowerCase(),
+        password: password,
+      })
+        .then((result) => {
+          if (result.status == 200) {
+            AsyncStorage.setItem("AccessToken", result.data.token);
+            navigation.replace("home");
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    } else {
+      alert(checkPassowrd);
+    }
+  };
+
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Register" component={RegisterScreen} />
-      <Stack.Screen name="Home" component={HomeScreen} />
-      <Stack.Screen name="Notifications" component={NotificationsScreen} />
-      <Stack.Screen name="Messages" component={MessagesScreen} />
-      <Stack.Screen name="Profile" component={ProfileScreen} />
-    </Stack.Navigator>
-  );
-}
-
-function ProfileTabNavigator() {
-  return (
-    <Tab.Navigator>
-      <Tab.Screen name="Edit Profile" component={EditProfileScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
-      <Tab.Screen name="Logout" component={LogoutScreen} />
-    </Tab.Navigator>
-  );
-}
-
-export default function App() {
-  return (
-    <NavigationContainer>
-      <MyStack />
-    </NavigationContainer>
-  );
-}
-
-function LoginScreen() {
-  const navigation = useNavigation();
-
-  return (
-    <View>
-      <Text>Login Screen</Text>
-      <TextInput placeholder="Email" />
-      <TextInput placeholder="Password" secureTextEntry={true} />
-      <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-        <Text>Register</Text>
-      </TouchableOpacity>
+    <View style={styles.container}>
+      <View style={styles.wrapperInput}>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={(text) => handleCheckEmail(text)}
+        />
+      </View>
+      {checkValidEmail ? (
+        <Text style={styles.textFailed}>Wrong format email</Text>
+      ) : (
+        <Text style={styles.textFailed}> </Text>
+      )}
+      <View style={styles.wrapperInput}>
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          secureTextEntry={seePassword}
+          onChangeText={(text) => setPassword(text)}
+        />
+        <TouchableOpacity
+          style={styles.wrapperIcon}
+          onPress={() => setSeePassword(!seePassword)}
+        >
+          <Text>login</Text>
+        </TouchableOpacity>
+      </View>
+      {email == "" || password == "" || checkValidEmail == true ? (
+        <TouchableOpacity
+          disabled
+          style={styles.buttonDisable}
+          onPress={handleLogin}
+        >
+          <Text style={styles.text}>Login</Text>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.text}>Login</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
-
-function RegisterScreen() {
-  return (
-    <View>
-      <Text>Register Screen</Text>
-    </View>
-  );
-}
-
-function HomeScreen() {
-  return (
-    <View>
-      <Text>Home Screen</Text>
-    </View>
-  );
-}
-
-function NotificationsScreen() {
-  return (
-    <View>
-      <Text>Notifications Screen</Text>
-    </View>
-  );
-}
-
-function MessagesScreen() {
-  return (
-    <View>
-      <Text>Messages Screen</Text>
-    </View>
-  );
-}
-
-function ProfileScreen() {
-  return (
-    <View>
-      <Text>Profile Screen</Text>
-      <ProfileTabNavigator />
-    </View>
-  );
-}
-
-function EditProfileScreen() {
-  return (
-    <View>
-      <Text>Edit Profile Screen</Text>
-    </View>
-  );
-}
-
-function SettingsScreen() {
-  return (
-    <View>
-      <Text>Settings Screen</Text>
-    </View>
-  );
-}
-
-function LogoutScreen() {
-  return (
-    <View>
-      <Text>Logout Screen</Text>
-    </View>
-  );
-}
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    marginHorizontal: 20,
+  },
+  wrapperInput: {
+    borderWidth: 0.5,
+    borderRadius: 5,
+    borderColor: "grey",
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  input: {
+    padding: 10,
+    width: "100%",
+  },
+  wrapperIcon: {
+    position: "absolute",
+    right: 0,
+    padding: 10,
+  },
+  icon: {
+    width: 30,
+    height: 24,
+  },
+  button: {
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "orange",
+    borderRadius: 5,
+    marginTop: 25,
+  },
+  buttonDisable: {
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "grey",
+    borderRadius: 5,
+    marginTop: 25,
+  },
+  text: {
+    color: "white",
+    fontWeight: "700",
+  },
+  textFailed: {
+    alignSelf: "flex-end",
+    color: "red",
+  },
+});

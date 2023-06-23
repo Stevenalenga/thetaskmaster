@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -6,9 +7,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
 import { UserApi } from "../Api/UserApi";
+//import {Eye, EyeActive} from '../../assets';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -54,119 +54,35 @@ export default function LoginScreen({ navigation }) {
       return "Password must be 8-16 Characters Long.";
     }
 
+    // const isContainsSymbol =
+    //   /^(?=.*[~`!@#$%^&*()--+={}\[\]|\\:;"'<>,.?/_₹]).*$/;
+    // if (!isContainsSymbol.test(value)) {
+    //   return 'Password must contain at least one Special Symbol.';
+    // }
+
     return null;
   };
-  /*
+
   const handleLogin = () => {
     const checkPassowrd = checkPasswordValidity(password);
     if (!checkPassowrd) {
-      // Replace the UserApi call with your own login logic
-       
-      // Simulating a successful login
-      navigation.replace("Home");
-    } else {
-      alert(checkPassowrd);
-    }
-  };
-
-  */
-  /*
-
-  const handleLogin = async () => {
-    const checkPassword = checkPasswordValidity(password);
-
-    if (!checkPassword) {
-      try {
-        await UserApi({
-          username: email.toLowerCase(),
-          password: password,
-        });
-
-        alert("Login Success");
-        // Simulating a successful login
-        navigation.replace("Home");
-      } catch (error) {
-        console.error(error);
-        // Handle error if the API call fails
-        alert("Login failed");
-      }
-    } else {
-      alert(checkPassword);
-    }
-  };
-
-  */
-  const handleLogin = async () => {
-    const checkPassword = checkPasswordValidity(password);
-
-    if (!checkPassword) {
-      try {
-        const result = await UserApi({
-          username: email.toLowerCase(),
-          password: password,
-        });
-
-        if (result.status === 200) {
-          await AsyncStorage.setItem("access_token", result.data.access_token);
-          alert("Login Success");
-          // Simulating a successful login
-          navigation.replace("Home");
-        }
-      } catch (error) {
-        console.error(error);
-        alert("Login failed");
-      }
-    } else {
-      alert(checkPassowrd);
-    }
-  };
-  /*
-
-const handleLogin = () => {
-    const checkPassowrd = checkPasswordValidity(password);
-    if (!checkPassowrd) {
-      user_login({
+      UserApi({
         email: email.toLocaleLowerCase(),
         password: password,
       })
-        .then(result => {
+        .then((result) => {
           if (result.status == 200) {
-            AsyncStorage.setItem('AccessToken', result.data.token);
-            navigation.replace('Home');
+            AsyncStorage.setItem("AccessToken", result.data.token);
+            navigation.navigate("Home");
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
         });
     } else {
       alert(checkPassowrd);
     }
   };
-
-  /*
-  const handleLogin = async () => {
-    // Add async keyword
-    const checkPassword = checkPasswordValidity(password);
-    if (!checkPassword) {
-      try {
-        const result = await UserApi({
-          username: email.toLocaleLowerCase(),
-          password: password,
-        });
-        const data = await result
-        if (data.status === 200) {
-          const accessToken = data.access_token;
-          AsyncStorage.setItem("access_token", accessToken);
-          navigation.replace("Home");
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    } else {
-      alert(checkPassword);
-    }
-  };
-  */
 
   return (
     <View style={styles.container}>
@@ -195,7 +111,7 @@ const handleLogin = () => {
           style={styles.wrapperIcon}
           onPress={() => setSeePassword(!seePassword)}
         >
-          <Text>Show/Hide</Text> {/* Changed the text to "Show/Hide" */}
+          <Text>login</Text>
         </TouchableOpacity>
       </View>
       {email == "" || password == "" || checkValidEmail == true ? (
@@ -214,7 +130,6 @@ const handleLogin = () => {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
