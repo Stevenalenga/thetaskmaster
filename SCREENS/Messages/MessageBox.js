@@ -22,6 +22,4 @@ const MessageBox = ({ contact }) => {
   );
 };
 
-
-  
 export default MessageBox;

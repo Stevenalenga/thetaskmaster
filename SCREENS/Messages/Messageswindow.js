@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Image, TextInput, TouchableOpacity, FlatList, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, FlatList } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import styles from "../../Styles/Messagestyles";
 
@@ -7,6 +7,8 @@ const MessagesWindow = () => {
   const [messages, setMessages] = useState([
     { id: "1", text: "Hello!", sender: true },
     { id: "2", text: "Hi, how are you?", sender: false },
+    { id: "3", text: "I'm doing great! How about you?", sender: true },
+    { id: "4", text: "Pretty good, thanks for asking. What have you been up to lately?", sender: false },
   ]);
   const [inputText, setInputText] = useState("");
 
@@ -19,7 +21,6 @@ const MessagesWindow = () => {
 
   const renderMessage = ({ item }) => (
     <View style={[styles.messageContainer, item.sender ? styles.sender : styles.receiver]}>
-      <Image source={{ uri: "https://picsum.photos/50" }} style={styles.profilePicture} />
       <View style={styles.textContainer}>
         <Text style={styles.messageText}>{item.text}</Text>
         <Text style={styles.userId}>{item.sender ? "Me" : "User1234"}</Text>
@@ -34,6 +35,7 @@ const MessagesWindow = () => {
         renderItem={renderMessage}
         keyExtractor={(item) => item.id}
         style={styles.messagesList}
+        contentContainerStyle={styles.messagesListContent}
       />
 
       <View style={styles.inputContainer}>
@@ -45,6 +47,7 @@ const MessagesWindow = () => {
           placeholder="Type a message"
           value={inputText}
           onChangeText={setInputText}
+          multiline
         />
         <TouchableOpacity style={styles.iconButton} onPress={handleSendMessage}>
           <Icon name="send" size={30} color="blue" />
@@ -53,6 +56,5 @@ const MessagesWindow = () => {
     </View>
   );
 };
-
 
 export default MessagesWindow;
