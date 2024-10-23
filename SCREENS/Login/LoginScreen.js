@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Text,
@@ -18,19 +17,28 @@ export default function LoginScreen({ navigation }) {
   const [checkValidEmail, setCheckValidEmail] = useState(false);
 
   const handleCheckEmail = (text) => {
-    let re = /\S+@\S+\.\S+/;
-    let regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
-
+    // Simplified email regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
     setEmail(text);
-    setCheckValidEmail(!(re.test(text) || regex.test(text)));
+    setCheckValidEmail(!emailRegex.test(text));
   };
 
   const checkPasswordValidity = (value) => {
-    if (!/^\S*$/.test(value)) return "Password must not contain Whitespaces.";
-    if (!/^(?=.*[A-Z]).*$/.test(value)) return "Password must have at least one Uppercase Character.";
-    if (!/^(?=.*[a-z]).*$/.test(value)) return "Password must have at least one Lowercase Character.";
-    if (!/^(?=.*[0-9]).*$/.test(value)) return "Password must contain at least one Digit.";
-    if (!/^.{8,}$/.test(value)) return "Password must be at least 8 Characters Long.";
+    const passwordChecks = [
+      { regex: /\s/, message: "Password must not contain whitespaces." },
+      { regex: /[A-Z]/, message: "Password must have at least one uppercase character." },
+      { regex: /[a-z]/, message: "Password must have at least one lowercase character." },
+      { regex: /\d/, message: "Password must contain at least one digit." },
+      { regex: /^.{8,}$/, message: "Password must be at least 8 characters long." }
+    ];
+
+    for (const check of passwordChecks) {
+      if (check.regex.test(value) !== (check.regex.source === /\s/.source)) {
+        return check.message;
+      }
+    }
+
     return null;
   };
 
